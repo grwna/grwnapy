@@ -1,0 +1,113 @@
+# List of functions
+# gcd
+# egcd
+# binexp (slower than pow())
+# modinv
+# isQuadrRes
+# findSqrRoot
+
+# ===== IMPORTABLE =====
+# ++++++++++ Booleans ++++++++++
+def isCoprime(a,b):
+    return gcd(a,b) == 1
+def isQuadrRes(n : int, p : int) -> bool:
+    return pow(n,(p-1)//2,p) == 1
+# ++++++++++ Calculations ++++++++++
+def gcd(a : int,b : int) -> int:
+    if b == 0:
+        return a
+    else:
+        return gcd(b,a%b)
+
+def egcd(a : int, b : int) -> tuple[int, int, int]:
+    x, y = 0, 1   # Coefficients for a
+    u, v = 1, 0   # Coefficients for b
+
+    while a != 0:
+        q = b // a      # Quotient
+        a, b = b % a, a
+        x, u = u - q * x, x
+        y, v = v - q * y, y
+
+    return b, v, u  # gcd, x, y for ax + by = gcd
+
+def binexp(a : int, b : int, p : int) -> int:      # binary exponentiation
+    res = 1
+    while b > 0:
+        if b % 2 == 1:
+            res = (res * a) % p
+        a = (a*a) % p
+        b = b // 2
+    return res
+
+def modinv(a : int, p : int):    # Calculates the Modular Inverse
+    # METHOD 1 (Slower)
+    # g, x, y = egcd(a,p)
+    # if x < 0:
+    #     x += p
+
+    # METHOD 2: Fermat
+    return pow(a, p - 2, p)
+
+
+def findSqrRoot(n : int, p : int) -> tuple[int,int]:   # Uses Tonelli-Shanks
+    if not isQuadrRes(n,p):
+        print("Value not quadratic residue, Square root does not exist")
+        return
+    
+    # Find z quadratic non residue
+    z = 2
+    while isQuadrRes(z,p):
+        z += 1
+
+    # Find Q
+    Q = (p-1)
+    S = 0
+    while Q % 2 == 0:
+        Q //= 2
+        S += 1
+    
+    M = S
+    c = pow(z, Q, p)
+    t = pow(n, Q, p)
+    R = pow(n, (Q+1)//2, p)
+    if t == 0:
+        return 0;
+    else:
+        while t != 1:
+            i = 0
+            temp = t
+            while temp != 1:
+                temp = pow(temp, 2, p)
+                i += 1
+
+            b = pow(c,pow(2,M-i-1),p)
+            M = i
+            c = pow(b, 2, p)
+            t = (t * c) % p
+            R = (R * b) % p
+        return R , p-R    
+
+def crt(a : list[int], p : list[int]) -> tuple[int,int]:
+    y = []
+    M = [] 
+    newP = 1
+    x = 0
+    # Initialize M & y
+    for i in range(len(a)):
+        Mtemp = 1
+        for j in range(len(a)):
+            if j != i:
+                Mtemp *= p[j]
+        M.append(Mtemp)
+        y.append(modinv(M[i],p[i]))
+    # Calculate the CRT
+        newP *= p[i]
+        x += a[i] * M[i] * y[i]
+    return (x % newP,newP)
+
+# ======== List and Strings ==========
+# Takes a string, and split it into equal (if possible) lengths of n
+def splitByN(text : str, n : int) -> list[str]:
+    return [text[i:i + n] for i in range(0, len(text), n)]
+# ===== NON-IMPORTABLE =====
