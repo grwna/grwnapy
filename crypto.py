@@ -1,3 +1,5 @@
+from Crypto.Util.number import *
+import base64
 # List of functions
 # gcd
 # egcd
@@ -47,7 +49,7 @@ def modinv(a : int, p : int):    # Calculates the Modular Inverse
     #     x += p
 
     # METHOD 2: Fermat
-    return pow(a, p - 2, p)
+    return pow(a, -1, p)
 
 
 def findSqrRoot(n : int, p : int) -> tuple[int,int]:   # Uses Tonelli-Shanks
@@ -110,4 +112,14 @@ def crt(a : list[int], p : list[int]) -> tuple[int,int]:
 # Takes a string, and split it into equal (if possible) lengths of n
 def splitByN(text : str, n : int) -> list[str]:
     return [text[i:i + n] for i in range(0, len(text), n)]
+
+def b64_to_long(b64_string):
+    decoded_bytes = base64.b64decode(b64_string)
+    long_int = bytes_to_long(decoded_bytes)
+    return long_int
+
+def long_to_b64(long_int):
+    byte_data = long_to_bytes(long_int)
+    b64_string = base64.b64encode(byte_data)
+    return b64_string
 # ===== NON-IMPORTABLE =====
