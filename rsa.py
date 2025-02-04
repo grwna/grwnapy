@@ -1,6 +1,11 @@
 import math
+from grwnapy.crypto import *
+import grwnapy.aes
+
+rsa_e = 65537
 
 def fermat_factorization(N):
+    """ Factorize n using fermat """
     a = math.ceil(math.sqrt(N))
     while True:
         b2 = a * a - N
@@ -13,6 +18,7 @@ def fermat_factorization(N):
 
 
 def fermat_large(n):
+    """ Factorize large n using fermat """
     a = math.isqrt(n) + 1  # Start with ceil(sqrt(n))
     while True:
         b2 = a * a - n

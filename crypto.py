@@ -13,7 +13,8 @@ import base64
 def isCoprime(a,b):
     return gcd(a,b) == 1
 def isQuadrRes(n : int, p : int) -> bool:
-    return pow(n,(p-1)//2,p) == 1
+    return pow(n,(p-1)//2,p) == 1 or pow(n,(p-1)//2,p) == 0 
+
 # ++++++++++ Calculations ++++++++++
 def gcd(a : int,b : int) -> int:
     if b == 0:
@@ -57,6 +58,11 @@ def findSqrRoot(n : int, p : int) -> tuple[int,int]:   # Uses Tonelli-Shanks
         print("Value not quadratic residue, Square root does not exist")
         return
     
+    if n % p == 0:
+        return 0
+    elif p % 4 == 3:
+        return pow(n, (p+1)//4, p)
+
     # Find z quadratic non residue
     z = 2
     while isQuadrRes(z,p):
@@ -107,6 +113,43 @@ def crt(a : list[int], p : list[int]) -> tuple[int,int]:
         newP *= p[i]
         x += a[i] * M[i] * y[i]
     return (x % newP,newP)
+
+# ======== Galois Theory =================
+def get_generator(p: int) -> int:
+    """ generate a primitive number g for generator from modulus p"""
+    factors = list(set(factor(p-1, mode="primefac")))
+    for g in range(2,p):
+        if all(pow(g, (p-1)//q,p) != 1 for q in factors):
+            return g
+    print("Generator not found")
+    return None
+
+
+# ======== Shortener =================
+# Shortens the syntax of other libraries for most used scenarios
+def factor(number: int, mode="factordb") -> list:
+    """ Return the factors of a number according to FactorDB """
+
+    if mode == "factordb":
+        from factordb.factordb import FactorDB
+        f = FactorDB(number)
+        f.connect()
+        factors = f.get_factor_list()
+    elif mode == "primefac":
+        from primefac import primefac
+        factors = primefac(number)
+    else:
+        print("Mode used is invalid!")
+        return 0
+
+    return factors
+
+def root(base: int, exponent: int) -> tuple:
+    """ Takes the root of base (base ** 1/exponent) \n
+        Returns (root, is_exact)"""
+    from gmpy2 import gmpy2
+    return gmpy2.iroot(base, exponent)
+
 
 # ======== List and Strings ==========
 # Takes a string, and split it into equal (if possible) lengths of n
