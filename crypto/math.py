@@ -15,7 +15,7 @@ def isCoprime(a,b):
 def isQuadrRes(n : int, p : int) -> bool:
     return pow(n,(p-1)//2,p) == 1 or pow(n,(p-1)//2,p) == 0 
 
-# ++++++++++ Calculations ++++++++++
+# ++++++++++ Mathematics ++++++++++
 def gcd(a : int,b : int) -> int:
     if b == 0:
         return a
@@ -23,6 +23,7 @@ def gcd(a : int,b : int) -> int:
         return gcd(b,a%b)
 
 def egcd(a : int, b : int) -> tuple[int, int, int]:
+    """ Returns GCD, Coeff for a, Coeff for b """
     x, y = 0, 1   # Coefficients for a
     u, v = 1, 0   # Coefficients for b
 
@@ -52,10 +53,28 @@ def modinv(a : int, p : int):    # Calculates the Modular Inverse
     # METHOD 2: Fermat
     return pow(a, -1, p)
 
+def logarithm(base, value):
+    count = 0
+    while value > 1:
+        if value % base != 0:
+            print("Logarithm cannot be computed.")
+            return None
+        value //= base
+        count += 1
 
-def findSqrRoot(n : int, p : int) -> tuple[int,int]:   # Uses Tonelli-Shanks
+    return count
+
+# ========== Advanced Modular Math ===================
+
+def get_sqr_root(n : int, p : int, errors="yes") -> tuple[int,int]:   # Uses Tonelli-Shanks
+    """ Tonelli-Shanks for square root extraction\n
+        n : Quadratic Residue of X^2\n
+        p : Modulus\n
+        errors : Shows errors or not """
+    
     if not isQuadrRes(n,p):
-        print("Value not quadratic residue, Square root does not exist")
+        if errors == "yes":
+            print("Value not quadratic residue, Square root does not exist")
         return
     
     if n % p == 0:
@@ -96,6 +115,7 @@ def findSqrRoot(n : int, p : int) -> tuple[int,int]:   # Uses Tonelli-Shanks
             R = (R * b) % p
         return R , p-R    
 
+
 def crt(a : list[int], p : list[int]) -> tuple[int,int]:
     y = []
     M = [] 
@@ -124,6 +144,13 @@ def get_generator(p: int) -> int:
     print("Generator not found")
     return None
 
+def discrete_log(g: int, h: int, p: int) -> int:
+    """ Solves for x, HAS TO BE RUN UNDER SAGE """
+    from sage.all import GF, discrete_log
+    F = GF(p)
+
+    return discrete_log(F(h), F(g))
+
 
 # ======== Shortener =================
 # Shortens the syntax of other libraries for most used scenarios
@@ -144,7 +171,13 @@ def factor(number: int, mode="factordb") -> list:
 
     return factors
 
-def root(base: int, exponent: int) -> tuple:
+def is_prime(number):
+    from factordb.factordb import FactorDB
+    f = FactorDB(number)
+    f.connect()
+    return f.is_prime()
+
+def get_root(base: int, exponent: int) -> tuple:
     """ Takes the root of base (base ** 1/exponent) \n
         Returns (root, is_exact)"""
     from gmpy2 import gmpy2
@@ -165,4 +198,7 @@ def long_to_b64(long_int):
     byte_data = long_to_bytes(long_int)
     b64_string = base64.b64encode(byte_data)
     return b64_string
+
+def count_bits(hex: str):
+    return len(hex)//2
 # ===== NON-IMPORTABLE =====

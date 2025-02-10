@@ -1,6 +1,5 @@
 import math
-from grwnapy.crypto import *
-import grwnapy.aes
+from grwnapy.crypto.math import get_sqr_root
 
 rsa_e = 65537
 
@@ -29,3 +28,22 @@ def fermat_large(n):
                 q = a - b
                 return p, q
         a += 1  # Increment `a` carefully to minimize iterations
+
+def rabin_even(ct: int, e: int, n: int):
+    """ Rabin-like decryption for even public exponent\n 
+        ct: ciphertext\n
+        e: public exponent\n
+        n: modulus """
+    roots = get_sqr_root(ct,n, errors="no")
+    iteration = int(math.log2(e)) - 1
+    for i in range(iteration):
+        new_roots = []
+        for root in roots:
+            try:
+                temproot = get_sqr_root(root, n, errors="no")
+                new_roots.append(temproot[0])
+                new_roots.append(temproot[1])
+            except:
+                continue
+        roots = new_roots.copy()
+    return roots
